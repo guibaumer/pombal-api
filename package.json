@@ -1,6 +1,6 @@
 {
   "type": "module",
-  "name": "login-postgres",
+  "name": "pombal-api",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
