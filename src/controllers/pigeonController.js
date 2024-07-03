@@ -1,4 +1,4 @@
-import { Pigeon } from '../models/PigeonModel.js';
+import { Pigeon } from '../models/pigeonModel.js';
 import cloudinary from '../../config/cloudinary.js';
 
 export const GetAllPigeons = async (req, res) => {
