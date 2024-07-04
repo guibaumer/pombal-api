@@ -16,11 +16,15 @@ export const CreatePigeon = async (req, res) => {
 
     const photo = req.file;
 
-    console.log(anilha, photo);
-
     const errors = [];
 
     if (!anilha || anilha.length > 20) errors.push('Adicione um valor válido para anilha');
+
+    const existingPigeon = await Pigeon.findOne({ where: { anilha } });
+    if (existingPigeon) {
+        errors.push('Anilha já registrada');
+    }
+    
     if (!photo) errors.push('Adicione uma foto');
 
     if (errors.length) {
