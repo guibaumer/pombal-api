@@ -12,13 +12,20 @@ export const GetAllPigeons = async (req, res) => {
 }
 
 export const CreatePigeon = async (req, res) => {
-    const { anilha } = req.body;
+    const { anilha, anilhaFather, anilhaMother } = req.body;
 
     const photo = req.file;
 
     const errors = [];
 
-    if (!anilha || anilha.length > 20) errors.push('Adicione um valor válido para anilha');
+    if (!anilha || anilha.length > 15) errors.push('Adicione um valor válido para anilha');
+
+    if (anilhaFather && anilhaFather.length > 15) {
+        errors.push('Anilha não pode ter mais de 15 caracteres');
+    }
+      if (anilhaMother && anilhaMother.length > 15) {
+        errors.push('Anilha não pode ter mais de 15 caracteres');
+    }
 
     const existingPigeon = await Pigeon.findOne({ where: { anilha } });
     if (existingPigeon) {
@@ -30,7 +37,7 @@ export const CreatePigeon = async (req, res) => {
     if (errors.length) {
         return res.status(400).send({ errors: errors });
     }
-    
+
     const uploadResult = await cloudinary.uploader
     .upload(
         photo.path,
@@ -44,7 +51,9 @@ export const CreatePigeon = async (req, res) => {
     const foto_path = uploadResult.secure_url;
     const newPigeonRegister = {
         anilha,
-        foto_path
+        foto_path,
+        father_anilha: anilhaFather,
+        mother_anilha: anilhaMother
     };
     
     try {

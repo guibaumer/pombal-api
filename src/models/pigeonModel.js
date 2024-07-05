@@ -42,9 +42,15 @@ export const Pigeon = sequelize.define(
       type: DataTypes.DATE,
       defaultValue: Sequelize.NOW,
     },
+    father_anilha: {
+      type: DataTypes.STRING,
+    },
+    mother_anilha: {
+      type: DataTypes.STRING
+    }
   },
   {
-    tableName: 'pombos', // Explicitly set the table name if different from the model name
-    timestamps: false, // Enables createdAt and updatedAt
+    tableName: 'pombos',
+    timestamps: false,
   }
 );
