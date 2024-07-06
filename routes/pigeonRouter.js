@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { CreatePigeon, GetAllPigeons, getPigeon } from '../src/controllers/pigeonController.js';
+import { CreatePigeon, GetAllPigeons, getPigeon, getPigeonPhoto } from '../src/controllers/pigeonController.js';
 import upload from '../config/multer.js';
 
 // import multer from 'multer';
@@ -7,12 +7,10 @@ import upload from '../config/multer.js';
 
 const router = new Router();
 
-router.post('/', upload.single('photo'), CreatePigeon);
-
 router.get('/', GetAllPigeons);
-// router.post('/', CreatePigeon);
-// router.put('/edit-pigeon', EditPigeon);
+router.post('/', upload.single('photo'), CreatePigeon);
 router.post('/get-pigeon-data', getPigeon);
+router.post('/get-photo', getPigeonPhoto);
 
 export default router;
 

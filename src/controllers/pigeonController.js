@@ -1,5 +1,6 @@
 import { Pigeon } from '../models/pigeonModel.js';
 import cloudinary from '../../config/cloudinary.js';
+import { response } from 'express';
 
 export const GetAllPigeons = async (req, res) => {
     try {
@@ -93,14 +94,46 @@ export const CreatePigeon = async (req, res) => {
 export const getPigeon = async (req, res) => {
     const { anilha } = req.body;
 
-    if (!anilha) return res.send({ message: 'Número da anilha necessário' }).status(400);
+    console.log(req.body);
+    console.log(anilha);
 
-    const register = await Pigeon.findOne({ where: { anilha: anilha }});
+    if (!anilha) return res.status(400).send({ message: 'Número da anilha necessário' });
 
-    if (register) {
-        return res.send({pigeon: register});
-    } else {
-        return res.send({message: 'Anilha não registrada'}).status(500);
+    try {
+        const register = await Pigeon.findOne({ where: { anilha: anilha }});
+
+        if (register) {
+            return res.send({ pigeon: register });
+        } else {
+            return res.status(500).send({ message: 'Anilha não registrada' });
+        }
+    } catch(err) {
+        console.log(err);
+        return res.status(500).send({ message: 'Tente novamente mais tarde' })
+    }
+}
+
+export const getPigeonPhoto = async (req, res) => {
+    const { anilha } = req.body;
+
+    console.log(anilha)
+
+    if (!anilha) return res.status(400).send({ message: 'Número da anilha necessário' });
+
+    try {
+        const path = await Pigeon.findOne({
+            attributes: ['foto_path'],
+            where: { anilha },
+        });
+
+        if (path) {
+            return res.send({ path });
+        } else {
+            return res.status(500).send({ message: 'Anilha não registrada' });
+        }
+    } catch(err) {
+        console.log(err);
+        return res.status(500).send({ message: 'Tente novamente mais tarde' })
     }
 }
 
