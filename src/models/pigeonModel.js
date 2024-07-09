@@ -47,6 +47,9 @@ export const Pigeon = sequelize.define(
     },
     mother_anilha: {
       type: DataTypes.STRING
+    },
+    sex: {
+      type: DataTypes.CHAR(1)
     }
   },
   {
