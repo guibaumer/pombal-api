@@ -199,23 +199,40 @@ export const getPigeonPhoto = async (req, res) => {
     }
 }
 
-// const { name, lastname } = req.body;
+export const getOffspring = async (req, res) => {
+    const { parentAnilha, sex } = req.body;
 
-//     if (!name || !lastname) return res.send({message: 'Dados não enviados'}).status(400);
+    console.log(parentAnilha, sex);
 
-//     const errors = [];
+    try {
+        if (sex === 'M') {
+            const data = await Pigeon.findAndCountAll({ where: { father_anilha: parentAnilha }});
+            console.log('---------PARENT: ' + data);
+            return res.send({ entries: data });
+        } else if (sex === 'F') {
+            const data = await Pigeon.findAndCountAll({ where: { mother_anilha: parentAnilha }});
+            console.log('---------PARENT: ' + data);
+            return res.send({ entries: data });
+        }
+        else {
+            return res.status(400).send({ message: 'Erro com os dados enviados'});
+        }
+    } catch(err) {
+        console.log(err);
+        res.status(500).send({ error: 'Erro ao buscar filhos' });
+    }
+}
 
-//     if (name.length < 3) errors.push('Nome deve ser maior ou igual a 3 caracteres.');
-//     if (lastname.length < 3) errors.push('Sobrenome deve ser maior ou igual a 3 caracteres.');
+export const deletePigeon = async (req, res) => {
+    const { anilha } = req.body;
 
-//     if (errors.length) {
-//         return res.status(400).send({message: errors});
-//     }
-    
-//     try {
-//         await User.update({ name: name, lastname: lastname }, { where: { id: req.session.user.user_id } });
-//         res.send({message: 'Conta editada'});
-//     } catch (err) {
-//         res.send({ message: 'Erro ao editar usuário. Tente novamente mais tarde' }).status(500);
-//         console.log(err);
-//     }
+    if (!anilha) return res.status(400).send({error: 'Anilha não enviada'});
+
+    try {
+        const data = await Pigeon.destroy({ where: { anilha }});
+        return res.send({ message: 'Registro deletado' });
+    } catch(err) {
+        console.log(err);
+        res.status(500).send({ error: 'Erro ao deletar' });
+    }
+}
