@@ -156,9 +156,6 @@ export const EditPigeon = async (req, res) => {
 export const getPigeon = async (req, res) => {
     const { anilha } = req.body;
 
-    console.log(req.body);
-    console.log(anilha);
-
     if (!anilha) return res.status(400).send({ message: 'Número da anilha necessário' });
 
     try {
@@ -167,7 +164,7 @@ export const getPigeon = async (req, res) => {
         if (register) {
             return res.send({ pigeon: register });
         } else {
-            return res.status(500).send({ message: 'Anilha não registrada' });
+            return res.status(500).send({ message: 'Anilha não registrada.' });
         }
     } catch(err) {
         console.log(err);
