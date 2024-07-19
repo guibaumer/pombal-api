@@ -2,6 +2,8 @@ import { Pigeon } from '../models/pigeonModel.js';
 import cloudinary from '../../config/cloudinary.js';
 import path from 'path';
 import { Sequelize } from 'sequelize';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 export const GetAllPigeons = async (req, res) => {
     try {
@@ -15,18 +17,27 @@ export const GetAllPigeons = async (req, res) => {
 
 export const CreatePigeon = async (req, res) => {
     const { anilha, anilhaFather, anilhaMother, sex } = req.body;
-
     const photo = req.file;
-
     const errors = [];
 
     if (!anilha || anilha.length > 15) errors.push('Adicione um valor válido para anilha');
 
-    if (anilhaFather && anilhaFather.length > 15) {
-        errors.push('Anilha não pode ter mais de 15 caracteres');
+    if (anilhaFather) {
+        if (anilhaFather.length > 15) {
+            errors.push('Anilha não pode ter mais de 15 caracteres');
+        }
+        if (!(await Pigeon.findOne({where: { anilha: anilhaFather, sex: 'M' }}))) {
+            errors.push('Anilha do pai não registrada');
+        }
     }
-    if (anilhaMother && anilhaMother.length > 15) {
-        errors.push('Anilha não pode ter mais de 15 caracteres');
+
+    if (anilhaMother) {
+        if (anilhaMother.length > 15) {
+            errors.push('Anilha não pode ter mais de 15 caracteres');
+        }
+        if (!(await Pigeon.findOne({where: { anilha: anilhaMother, sex: 'F' }}))) {
+            errors.push('Anilha da mãe não registrada');
+        }
     }
 
     if (!sex) {
@@ -72,6 +83,7 @@ export const CreatePigeon = async (req, res) => {
     };
     
     try {
+        console.log(newPigeonRegister);
         await Pigeon.create(newPigeonRegister);
         res.send({ message: 'Registro realizado' });
     } catch(err) {
@@ -175,8 +187,6 @@ export const getPigeon = async (req, res) => {
 export const getPigeonPhoto = async (req, res) => {
     const { anilha } = req.body;
 
-    console.log(anilha)
-
     if (!anilha) return res.status(400).send({ message: 'Número da anilha necessário' });
 
     try {
@@ -188,7 +198,7 @@ export const getPigeonPhoto = async (req, res) => {
         if (path) {
             return res.send({ path });
         } else {
-            return res.status(500).send({ message: 'Anilha não registrada' });
+            return res.status(400).send({ message: 'Sem foto registrada' });
         }
     } catch(err) {
         console.log(err);
@@ -199,16 +209,12 @@ export const getPigeonPhoto = async (req, res) => {
 export const getOffspring = async (req, res) => {
     const { parentAnilha, sex } = req.body;
 
-    console.log(parentAnilha, sex);
-
     try {
         if (sex === 'M') {
             const data = await Pigeon.findAndCountAll({ where: { father_anilha: parentAnilha }});
-            console.log('---------PARENT: ' + data);
             return res.send({ entries: data });
         } else if (sex === 'F') {
             const data = await Pigeon.findAndCountAll({ where: { mother_anilha: parentAnilha }});
-            console.log('---------PARENT: ' + data);
             return res.send({ entries: data });
         }
         else {
@@ -221,9 +227,10 @@ export const getOffspring = async (req, res) => {
 }
 
 export const deletePigeon = async (req, res) => {
-    const { anilha } = req.body;
+    const { anilha, password } = req.body;
 
     if (!anilha) return res.status(400).send({error: 'Anilha não enviada'});
+    if (password !== process.env.USER_PASSWORD) return res.status(401).send({error: 'Senha inválida'});
 
     try {
         const data = await Pigeon.destroy({ where: { anilha }});
