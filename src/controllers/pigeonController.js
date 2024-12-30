@@ -16,7 +16,7 @@ export const GetAllPigeons = async (req, res) => {
 }
 
 export const CreatePigeon = async (req, res) => {
-    const { anilha, anilhaFather, anilhaMother, sex } = req.body;
+    const { anilha, anilhaFather, anilhaMother, sex, description } = req.body;
     const photo = req.file;
     const errors = [];
 
@@ -42,6 +42,16 @@ export const CreatePigeon = async (req, res) => {
 
     if (!sex) {
         errors.push('Indique se o pombo é macho ou fêmea');
+    }
+
+    if (description) {
+        if (typeof description !== 'string') {
+            errors.push('Descrição deve ser um texto');
+        } else {
+            if (description.length > 90) {
+                errors.push('Descrição muito grande');
+            }
+        }
     }
 
     const existingPigeon = await Pigeon.findOne({ where: { anilha } });
@@ -79,7 +89,8 @@ export const CreatePigeon = async (req, res) => {
         foto_path,
         father_anilha: anilhaFather,
         mother_anilha: anilhaMother,
-        sex
+        sex,
+        description
     };
     
     try {
@@ -93,7 +104,7 @@ export const CreatePigeon = async (req, res) => {
 }
 
 export const EditPigeon = async (req, res) => {
-    const { anilha, anilhaFather, anilhaMother, sex, urlPhoto, id } = req.body;
+    const { anilha, anilhaFather, anilhaMother, sex, urlPhoto, id, description } = req.body;
 
     const photo = req.file;
 
@@ -109,6 +120,15 @@ export const EditPigeon = async (req, res) => {
     }
     if (sex && sex !== 'M' && sex !== 'F') {
         errors.push('Indique se o pombo é macho ou fêmea');
+    }
+    if (description) {
+            if (typeof description !== 'string') {
+                errors.push('Descrição deve ser um texto');
+            } else {
+                if (description.length > 90) {
+                    errors.push('Descrição muito grande');
+                }
+            }
     }
 
     const existingPigeon = await Pigeon.findOne({
@@ -153,6 +173,7 @@ export const EditPigeon = async (req, res) => {
         father_anilha: anilhaFather,
         mother_anilha: anilhaMother,
         sex,
+        description
     };
 
     try {

@@ -50,6 +50,9 @@ export const Pigeon = sequelize.define(
     },
     sex: {
       type: DataTypes.CHAR(1)
+    },
+    description: {
+      type: DataTypes.TEXT,
     }
   },
   {
